@@ -1,6 +1,6 @@
 @import "reset";
 @import "mixins";
-
+@import "misc";
 
 html {
 
@@ -10,10 +10,20 @@ body {
 	font-family: ;
 	color: white;
 	-webkit-font-smoothing: antialiased;
-	font: 500 20px/30px "museo-sans-rounded", sans-serif;
+	font: 500 15px/22px "museo-sans-rounded", sans-serif;
 	color: #969696;
 	background: #eaeaea;
 }
+
+a {
+	color: #969696;
+	text-decoration: none;
+	&:hover {
+		color: #4b4b4b;
+	}
+}
+
+
 
 #container {
 	width: 854px;
@@ -38,7 +48,7 @@ body {
 	overflow-x: auto;
 	overflow-y: hidden;
 	white-space: nowrap;
-	word-spacing: -0.26em;
+	word-spacing: -0.3em;
 	padding-left: 100px;
 	.border-radius(15px);
 	
@@ -98,7 +108,6 @@ body {
 	}
 }
 
-
 .track-segments {
 	.clearfix();
 	
@@ -143,6 +152,26 @@ body {
 }
 
 
+.popover {
+	.box-sizing(border-box);
+	width: 400px;
+	padding: 20px;
+	background: white;
+	.border-radius(20px);
+	.box-shadow(0 3px 20px rgba(0,0,0,0.15));
+	position: absolute;
+	textarea {
+		width: 100%;
+		margin: 0 0 15px 0;
+	}
+	.secondary-action {
+		.clearfix();
+		margin: 0 0 25px 0;
+	}
+	.action {
+		.clearfix();
+	}
+}
 
 
 
