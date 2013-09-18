@@ -14,7 +14,7 @@
 	display: none;
 }
 
-/* Scrollbars */
+/* Scrollbars, Placeholder, etc */
 /*-------------------------------------------------*/
 
 
@@ -34,16 +34,45 @@
 	background: #e3e3e3;
 }
 
+::-webkit-input-placeholder {
+	color: #b9b9b9;
+	font-weight: 300;
+}
+
+:-moz-placeholder { /* Firefox 18- */
+	color: #b9b9b9;
+	font-weight: 300;
+}
+
+::-moz-placeholder {  /* Firefox 19+ */
+	color: #b9b9b9;
+	font-weight: 300;
+}
+
+:-ms-input-placeholder {  
+	color: #b9b9b9;
+	font-weight: 300;
+}
+
 
 /* Headlines */
 /*-------------------------------------------------*/
 
 
 h1 {
-	font-size: 20px;
+	font-size: 22px;
 	color: #4b4b4b;
 	font-weight: 500;
 	margin: 0 0 20px 0;
+}
+
+h2 {
+	font-size: 18px;
+	color: #9d9d9d;
+	font-weight: 500;
+	margin: 0 0 20px 0;
+	line-height: 26px;
+	cursor: default;
 }
 
 
