@@ -82,6 +82,15 @@ h1 {
 			background: #ea7d00;
 		}
 	}
+	&.disabled,
+		&[disabled],
+		fieldset[disabled] & {
+			cursor: not-allowed;
+			pointer-events: none; // Future-proof disabling of clicks
+			background: #f2f2f2;
+			color: #d8d8d8;
+			.box-shadow(none);
+		}
 }
 
 .btn-group {
@@ -151,4 +160,35 @@ input[type=checkbox]:checked::after {
 
 
 
+/* Icons */
+/*-------------------------------------------------*/
+
+
+.icon-next-arrow {
+	width: 17px;
+	height: 15px;
+	background: url("/images/icon-next-arrow.png");
+	background-size: cover;
+	display: inline-block;
+	opacity: 0.2;
+	vertical-align: middle;
+}
+
+.icon-replay {
+	width: 17px;
+	height: 17px;
+	background: url("/images/icon-replay.png");
+	background-size: cover;
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.icon-replay-slower {
+	width: 30px;
+	height: 17px;
+	background: url("/images/icon-replay-slower.png");
+	background-size: cover;
+	display: inline-block;
+	vertical-align: middle;
+}
 
