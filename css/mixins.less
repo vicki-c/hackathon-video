@@ -2,8 +2,10 @@
 // Colors
 //------------------------------
 
-@blue: #0ebbf3;
-@orange: #f6850f;
+@blue: #2cb8e0;
+@orange: #ff9a21;
+@green: #99cc00;
+@red: #ff4444;
 
 // Mixins
 //------------------------------
@@ -258,4 +260,21 @@
 	-moz-transform-origin:    @x @y;
 	-ms-transform-origin:     @x @y;
 	-o-transform-origin:      @x @y;
+}
+
+
+::-webkit-scrollbar {
+   height: 12px;
+}
+ 
+::-webkit-scrollbar-track {
+    height: 12px;
+    border-radius: 20px;
+		background: white;
+}
+ 
+::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+		height: 12px;
+    background: #e3e3e3;
 }

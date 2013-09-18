@@ -14,3 +14,67 @@ body {
 	color: #969696;
 	background: #eaeaea;
 }
+
+#container {
+	width: 854px;
+	margin: 50px auto 50px auto;
+}
+
+.video-placeholder {
+	width: 854px;
+	height: 510px;
+	background: white;
+	margin: 0 0 20px 0;
+}
+
+.language-tracks {
+	.border-radius(20px);
+	background: white;
+	padding: 10px;
+}
+
+.language-track-list {
+	overflow-x: auto;
+	overflow-y: hidden;
+	
+	white-space: nowrap;
+	word-spacing: -0.26em;
+	.language-track {
+		background: #f2f2f2;
+		.border-radius(15px);
+		height: 100px;
+		
+		margin: 0 0 10px 0;
+		&.original {
+			.track-segment {
+				border-right: 2px solid @blue;
+				&.recorded {
+					background: #b1eaff;
+				}
+				&.recording {
+					background: url("/images/soundwave-blue.png") repeat-x #b1eaff;
+				}
+			}
+		}
+		&.translation {
+			.track-segment {
+				border-right: 2px solid @orange;
+				&.recorded {
+					background: #ffe1a4;
+				}
+				&.recording {
+					background: url("/images/soundwave-orange.png") repeat-x #ffe1a4;
+				}
+			}
+		}
+	}
+}
+
+
+.track-segments {
+	.clearfix();
+	.track-segment {
+		display: inline-block;
+		height: 100px;
+	}
+}
