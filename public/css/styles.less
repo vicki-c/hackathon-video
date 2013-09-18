@@ -63,6 +63,13 @@ a {
 				border-right: 2px solid @blue;
 				&.recorded {
 					background: #b1eaff;
+					&:hover {
+						cursor: pointer;
+						background: #a0e3fc;
+					}
+					&:active {
+						background: #b1eaff;
+					}
 				}
 				&.recording {
 					background: url("/images/soundwave-blue.png") repeat-x #b1eaff;
@@ -75,8 +82,16 @@ a {
 		&.translation {
 			.track-segment {
 				border-right: 2px solid @orange;
+				background: #ffe1a4;
 				&.recorded {
-					background: #ffe1a4;
+					
+					&:hover {
+						cursor: pointer;
+						background: #ffdd97;
+					}
+					&:active {
+						background: #ffe1a4;
+					}
 				}
 				&.recording {
 					background: url("/images/soundwave-orange.png") repeat-x #ffe1a4;
