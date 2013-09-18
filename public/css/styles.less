@@ -221,5 +221,23 @@ a {
 	}
 }
 
-
+.hint {
+	position: absolute;
+	color: #4b4b4b;
+	text-align: center;
+	background: white;
+	font-size: 15px;
+	.border-radius(10px);
+	.box-shadow(0 4px 15px rgba(0,0,0,0.2));
+	.list-hints {
+		>li {
+			min-width: 80px;
+			padding: 6px 20px;
+			border-top: 1px solid #ededed;
+			&:first-child {
+				border-top: none;
+			}
+		}
+	}
+}
 
