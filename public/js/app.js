@@ -10,16 +10,20 @@ App.Router.map(function() {
 
 App.VideoRoute = Ember.Route.extend({
     model: function(params) {
-        return {
-            video_id: params.video_id,
-            video_url: 'http://www.youtube.com/watch?v=' + params.video_id
-        };
+        var model = this.store.createRecord('video', {
+            videoId: params.video_id
+        });
+        return model;
     }
 });
 
-App.VideoTranscription = DS.Model.extend({
+App.Video = DS.Model.extend({
+    videoId: DS.attr('string'),
     sourceSegments: DS.hasMany('segment'),
-    targetSegments: DS.hasMany('segment')
+    targetSegments: DS.hasMany('segment'),
+    videoUrl: function() {
+        return 'http://www.youtube.com/watch?v=' + this.get('videoId')
+    }.property('videoId')
 });
 
 App.Segment = DS.Model.extend({
@@ -29,9 +33,22 @@ App.Segment = DS.Model.extend({
 });
 
 App.VideoController = Ember.ObjectController.extend({
+    nextCutoff: 0,
+    cutoff: 8,
+    sourceProgress: 0,
     actions: {
-        timeUpdated: function(time){
-            console.log('current: ' + time);
+        timeUpdated: function(media){
+            var time = media.currentTime, total = media.duration;
+            console.log('current: ' + time, total, this.get('model.sourceSegments'));
+            if(time > this.get('nextCutoff')) {
+                var segment = this.store.createRecord('segment', {
+                    start: time
+                });
+                this.get('model.sourceSegments').pushObject(segment);
+                segment.save();
+                this.set('nextCutoff', this.get('nextCutoff')+this.get('cutoff'));
+                this.set('sourceProgress', Math.ceil(time*100/total));
+            }
         }
     }
 });
@@ -52,7 +69,7 @@ App.VideoPlayerView = Ember.View.extend({
          
                 media.addEventListener('timeupdate', function() {
                     // access HTML5-like properties
-                    self.get('controller').send('timeUpdated', media.currentTime);
+                    self.get('controller').send('timeUpdated', media);
                 }, false);
          
                 // add click events to control player
