@@ -19,6 +19,7 @@ App.VideoPlayerView = Ember.View.extend({
     didInsertElement : function() {
         // JavaScript object for later use
         var player = new MediaElementPlayer('#player', {
+            alwaysShowControls: true,
             success: function(media, domNode, player) {
                 // add HTML5 events to the YouTube API media object
                 media.addEventListener('play', function() {
