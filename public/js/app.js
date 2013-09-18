@@ -2,6 +2,8 @@ App = Ember.Application.create({
     LOG_TRANSITIONS: true
 });
 
+App.ApplicationAdapter = DS.FixtureAdapter.extend();
+
 App.Router.map(function() {
     this.resource('video', { path: '/:video_id' });
 });
@@ -15,9 +17,29 @@ App.VideoRoute = Ember.Route.extend({
     }
 });
 
+App.VideoTranscription = DS.Model.extend({
+    sourceSegments: DS.hasMany('segment'),
+    targetSegments: DS.hasMany('segment')
+});
+
+App.Segment = DS.Model.extend({
+    text: DS.attr('string'),
+    start: DS.attr(),
+    end: DS.attr()
+});
+
+App.VideoController = Ember.ObjectController.extend({
+    actions: {
+        timeUpdated: function(time){
+            console.log('current: ' + time);
+        }
+    }
+});
+
 App.VideoPlayerView = Ember.View.extend({
     didInsertElement : function() {
         // JavaScript object for later use
+        var self = this;
         var player = new MediaElementPlayer('#player', {
             alwaysShowControls: true,
             features: ['playpause','current','progress'],
@@ -29,8 +51,8 @@ App.VideoPlayerView = Ember.View.extend({
                 }, false);
          
                 media.addEventListener('timeupdate', function() {
-        // access HTML5-like properties
-                    console.log('current: ' + media.currentTime);
+                    // access HTML5-like properties
+                    self.get('controller').send('timeUpdated', media.currentTime);
                 }, false);
          
                 // add click events to control player
