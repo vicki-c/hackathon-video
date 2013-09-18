@@ -3,7 +3,7 @@
 //------------------------------
 
 @blue: #2cb8e0;
-@orange: #ff9a21;
+@orange: #ff8800;
 @green: #99cc00;
 @red: #ff4444;
 
@@ -277,4 +277,37 @@
     border-radius: 10px;
 		height: 12px;
     background: #e3e3e3;
+}
+
+
+.btn {
+	height: 36px;
+	.border-radius(30px);
+	border: none;
+	padding: 0 20px;
+	&.blue {
+		background: @blue;
+		color: white;
+		&:hover {
+			background: #31c4ee;
+		}
+		&:active {
+			background: #2fa6d2;
+		}
+	}
+	
+	&.green {
+		background: @green;
+		color: white;
+	}
+	&.orange {
+		background: @orange;
+		color: white;
+		&:hover {
+			background: #ff941a;
+		}
+		&:active {
+			background: #ea7d00;
+		}
+	}
 }
