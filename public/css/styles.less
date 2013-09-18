@@ -63,6 +63,13 @@ a {
 				border-right: 2px solid @blue;
 				&.recorded {
 					background: #b1eaff;
+					&:hover {
+						cursor: pointer;
+						background: #a0e3fc;
+					}
+					&:active {
+						background: #b1eaff;
+					}
 				}
 				&.recording {
 					background: url("/images/soundwave-blue.png") repeat-x #b1eaff;
@@ -75,8 +82,16 @@ a {
 		&.translation {
 			.track-segment {
 				border-right: 2px solid @orange;
+				background: #ffe1a4;
 				&.recorded {
-					background: #ffe1a4;
+					
+					&:hover {
+						cursor: pointer;
+						background: #ffdd97;
+					}
+					&:active {
+						background: #ffe1a4;
+					}
 				}
 				&.recording {
 					background: url("/images/soundwave-orange.png") repeat-x #ffe1a4;
@@ -221,5 +236,23 @@ a {
 	}
 }
 
-
+.hint {
+	position: absolute;
+	color: #4b4b4b;
+	text-align: center;
+	background: white;
+	font-size: 15px;
+	.border-radius(10px);
+	.box-shadow(0 4px 15px rgba(0,0,0,0.2));
+	.list-hints {
+		>li {
+			min-width: 80px;
+			padding: 6px 20px;
+			border-top: 1px solid #ededed;
+			&:first-child {
+				border-top: none;
+			}
+		}
+	}
+}
 
