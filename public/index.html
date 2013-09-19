@@ -20,6 +20,31 @@
     
     <body>
         
+        <script type="text/x-handlebars" data-template-name="segment">
+            <li {{bind-attr class="done:recorded:recording :track-segment"}} style="width: 200px;">
+                {{#if played}}
+                    <div class="popover" style="top: -80px; left: 350px;">
+                        <div class="close"></div>
+                        <h1>Type what you heard</h1>
+                        {{textarea placeholder="Type in French" valueBinding="transcription"}}
+                        <div class="secondary-action">
+                            <div class="left"><label><input type="checkbox"/> Nothing was said</label></div>
+                            <div class="right"><a href="" class="skip" {{action "skip" model}}>Skip segment <span class="icon-next-arrow"></span></a></div>
+                        </div>
+                        <div class="action">
+                            <div class="btn-group left">
+                                <button class="btn blue play-again" {{action "replay" model}}><span class="icon-replay"></span> Play again</button>
+                                <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
+                            </div>
+                            <button class="btn green right" {{action "submitTranscription" model}}>Submit</button>
+                        </div>
+                    </div>
+                {{/if}}
+                {{#if done}}
+                    <div class="text"><p>{{text}}</p></div>
+                {{/if}}
+            </li>
+        </script>
         
         <script type="text/x-handlebars" data-template-name="video">
             <div id="container">
@@ -37,29 +62,7 @@
                         <li class="language-track original">
                             <ul class="track-segments">
                                 {{#each segment in sourceSegments}}
-                                    <li {{bind-attr class="segment.done:recorded:recording :track-segment"}} style="width: 200px;">
-                                        {{#if segment.played}}
-                                            <div class="popover" style="top: -80px; left: 350px;">
-                                                <div class="close"></div>
-                                                <h1>Type what you heard</h1>
-                                                {{textarea placeholder="Type in French" valueBinding="transcription"}}
-                                                <div class="secondary-action">
-                                                    <div class="left"><label><input type="checkbox"/> Nothing was said</label></div>
-                                                    <div class="right"><a href="" class="skip" {{action "skip" segment}}>Skip segment <span class="icon-next-arrow"></span></a></div>
-                                                </div>
-                                                <div class="action">
-                                                    <div class="btn-group left">
-                                                        <button class="btn blue play-again" {{action "replay" segment}}><span class="icon-replay"></span> Play again</button>
-                                                        <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
-                                                    </div>
-                                                    <button class="btn green right" {{action "submitTranscription" segment}}>Submit</button>
-                                                </div>
-                                            </div>
-                                        {{/if}}
-                                        {{#if segment.done}}
-                                            <div class="text"><p>{{segment.text}}</p></div>
-                                        {{/if}}
-                                    </li>
+                                    {{render 'segment' segment}}
                                 {{/each}}
                                 <li class="track-segment empty">
                                     <div class="text"><p><button class="btn blue">Start transcribing</button></p></div>
@@ -68,9 +71,44 @@
                         </li>
                         <li class="language-track translation">
                             <ul class="track-segments">
-                                <li class="track-segment recorded" style="width: 200px;">
-                                    <div class="text"><p><button class="btn orange">Start translating</button></p></div>
-                                </li>
+                                {{#each segment in targetSegments}}
+                                    <li class="track-segment recorded" style="width: 200px;">
+                                        {{#if segment.done}}
+                                            <div class="popover" style="top: -80px; left: 350px;">
+                                                <div class="close"></div>
+                                                <h1>Translate into English</h1>
+                                                <h2 class="">
+                                                    <span class="hintable">La</span>
+                                                    <span class="hintable">
+                                                        fille
+                                                        <div class="hint" style="display: block; top: 35px; left: -45px;">
+                                                            <ul class="list-hints">
+                                                                <li>Girl</li>
+                                                                <li>Woman</li>
+                                                                <li>Girly</li>
+                                                                <li>▾</li>
+                                                            </ul>
+                                                        </div>
+                                                    </span>
+                                                    <span class="hintable">mange</span>
+                                                    <span class="hintable">une</span>
+                                                    <span class="hintable">pomme</span>
+                                                </h2>
+                                                <textarea placeholder="Type in French"></textarea>
+                                                
+                                                <div class="action">
+                                                    <div class="btn-group left">
+                                                        <button class="btn blue play-again"><span class="icon-replay"></span> Play again</button>
+                                                        <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
+                                                    </div>
+                                                    <button class="btn green right" disabled="disabled">Submit</button>
+                                                </div>
+                                            </div>
+                                        {{/if}}
+                                        <div class="text"><p><button class="btn orange">Start translating</button></p></div>
+                                        }
+                                    </li>
+                                {{/each}}
                                 <li class="track-segment recording" style="width: 200px;"></li>
                                 
                             </ul>
@@ -79,125 +117,7 @@
                     
                     <div class="track-label original"><div class="flag flag-fr"></div>French: {{sourceProgress}}%</div>
                     <div class="track-label translation"><div class="flag flag-en"></div>English: 0%</div>
-                    
-                    
-                    <div class="popover hidden" style="top: -80px; left: 350px;">
-                        <div class="close"></div>
-                        <h1>Type what you heard</h1>
-                        <textarea id="transcription" placeholder="Type in French"></textarea>
-                        <div class="secondary-action">
-                            <div class="left"><label><input type="checkbox"/> Nothing was said</label></div>
-                            <div class="right"><a href="" class="skip" {{action "skip"}}>Skip segment <span class="icon-next-arrow"></span></a></div>
-                        </div>
-                        <div class="action">
-                            <div class="btn-group left">
-                                <button class="btn blue play-again" {{action "reply"}}><span class="icon-replay"></span> Play again</button>
-                                <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
-                            </div>
-                            <button class="btn green right" {{action "submitTranscription"}}>Submit</button>
-                        </div>
-                    </div>
-                    
-                    <div class="popover hidden" style="top: -80px; left: 350px;">
-                        <div class="close"></div>
-                        <h1>Translate into English</h1>
-                        <h2 class=""><span class="hintable">La</span> <span class="hintable">fille</span> <span class="hintable">mange</span> <span class="hintable">une</span> <span class="hintable">pomme</span></h2>
-                        <textarea placeholder="Type in French"></textarea>
-                        
-                        <div class="action">
-                            <div class="btn-group left">
-                                <button class="btn blue play-again"><span class="icon-replay"></span> Play again</button>
-                                <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
-                            </div>
-                            <button class="btn green right" disabled="disabled">Submit</button>
-                        </div>
-                    </div>
-                    
                 </div>
-                
-                
-                <div class="language-tracks">
-                    
-                    <ul class="language-track-list">
-                        <li class="language-track original">
-                            <ul class="track-segments">
-                                <li class="track-segment recorded" style="width: 200px;">
-                                    <div class="text"><p>La fille mange une pomme et une orange</p></div>
-                                </li>
-                                <li class="track-segment recording" style="width: 200px;"></li>
-                                <li class="track-segment recording" style="width: 200px;"></li>
-                                <li class="track-segment recording" style="width: 200px;"></li>
-                                <li class="track-segment recording" style="width: 200px;"></li>
-                                <li class="track-segment empty">
-                                    <div class="text"><p><button class="btn blue">Start transcribing</button></p></div>
-                                </li>
-                            </ul>
-                        </li>
-                        <li class="language-track translation">
-                            <ul class="track-segments">
-                                <li class="track-segment" style="width: 200px;">
-                                    <div class="text"><p><button class="btn orange">Start translating</button></p></div>
-                                </li>
-                                <li class="track-segment recording" style="width: 200px;"></li>
-                                
-                            </ul>
-                        </li>
-                    </ul>
-                    
-                    <div class="track-label original"><div class="flag flag-fr"></div>French: 0%</div>
-                    <div class="track-label translation"><div class="flag flag-en"></div>English: 0%</div>
-                    
-                    
-                    <div class="popover " style="top: -80px; left: 350px;">
-                        <div class="close"></div>
-                        <h1>Type what you heard</h1>
-                        <textarea placeholder="Type in French"></textarea>
-                        <div class="secondary-action">
-                            <div class="left"><label><input type="checkbox"/> Nothing was said</label></div>
-                            <div class="right"><a href="" class="skip">Skip segment <span class="icon-next-arrow"></span></a></div>
-                        </div>
-                        <div class="action">
-                            <div class="btn-group left">
-                                <button class="btn blue play-again"><span class="icon-replay"></span> Play again</button>
-                                <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
-                            </div>
-                            <button class="btn green right" disabled="disabled">Submit</button>
-                        </div>
-                    </div>
-                    
-                    <div class="popover hidden" style="top: -80px; left: 350px;">
-                        <div class="close"></div>
-                        <h1>Translate into English</h1>
-                        <h2 class="">
-                            <span class="hintable">La</span>
-                            <span class="hintable">
-                                fille
-                                <div class="hint" style="display: block; top: 35px; left: -45px;">
-                                    <ul class="list-hints">
-                                        <li>Girl</li>
-                                        <li>Woman</li>
-                                        <li>Girly</li>
-                                        <li>▾</li>
-                                    </ul>
-                                </div>
-                            </span>
-                            <span class="hintable">mange</span>
-                            <span class="hintable">une</span>
-                            <span class="hintable">pomme</span>
-                        </h2>
-                        <textarea placeholder="Type in French"></textarea>
-                        
-                        <div class="action">
-                            <div class="btn-group left">
-                                <button class="btn blue play-again"><span class="icon-replay"></span> Play again</button>
-                                <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
-                            </div>
-                            <button class="btn green right" disabled="disabled">Submit</button>
-                        </div>
-                    </div>
-                    
-                </div>
-                
                 
             </div>
         </script>
