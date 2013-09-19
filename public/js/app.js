@@ -39,6 +39,8 @@ App.Segment = DS.Model.extend({
     }
 });
 
+var _SEGMENT_WIDTH = 200;
+
 App.VideoController = Ember.ObjectController.extend({
     cutoff: 6,
     sourceProgress: 0,
@@ -66,8 +68,16 @@ App.VideoController = Ember.ObjectController.extend({
             }
             if(segment) {
                 // HACK
-                var segmentProgress = (time - segment.get('start'))/this.get('cutoff');
-                $('#'+segment.id).css('width', Math.max(1, segmentProgress*200));
+                var $orig = $('.original #'+segment.id);
+                if($orig.width() < _SEGMENT_WIDTH) {
+                    var segmentProgress = (time - segment.get('start'))/this.get('cutoff');
+                    $orig.css('width', Math.max(_SEGMENT_WIDTH, segmentProgress*_SEGMENT_WIDTH));
+                }
+                var $trans = $('.translation #'+segment.id);
+                if($trans.width() < _SEGMENT_WIDTH) {
+                    var segmentProgress = (time - segment.get('start'))/this.get('cutoff');
+                    $trans.css('width', Math.max(_SEGMENT_WIDTH, segmentProgress*_SEGMENT_WIDTH));
+                }
             }
         },
         submitTranscription : function(segment) {

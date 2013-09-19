@@ -84,13 +84,14 @@
         
         <script type="text/x-handlebars" data-template-name="target-segment">
             {{#if translating}}
-                <li class="track-segment recorded" style="width: 200px;">
-                    {{#unless nothingSaid}}
-                        {{#if translation}}
-                            <div {{action "focusSegment" model}} class="text">
-                                <p>{{translation}}</p>
-                            </div>
-                        {{/if}}
+                {{#if nothingSaid}}
+                    <li class="track-segment recording" style="width: 200px;">
+                    </li>
+                {{else}}
+                    <li {{bind-attr id="id"}} class="track-segment recorded" style="width: 0px;">
+                        <div {{action "focusSegment" model}} class="text">
+                            <p>{{translation}}</p>
+                        </div>
                         {{#if focus}}
                             <div class="popover" style="top: -80px; left: 350px;">
                                 <div {{action "close"}} class="close"></div>
@@ -127,8 +128,8 @@
                                 </div>
                             </div>
                         {{/if}}
-                    {{/unless}}
-                </li>
+                    </li>
+                {{/if}}
             {{/if}}
         </script>
 
