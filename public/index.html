@@ -50,7 +50,7 @@
                         <h1>Type what you heard</h1>
                         <div class="relative">
                             <button {{action "toggleKeyboard"}} class="toggle-vkeyboard">éÁ</button>
-                            {{textarea placeholder="Type in French" valueBinding="model.text" disabledBinding="nothingSaid"}}
+                            {{textarea name="transcription" placeholder="Type in French" valueBinding="model.text" disabledBinding="nothingSaid"}}
                             {{#if virtualKeyboard}}
                                 <div class="vkeyboard">
                                     <button {{action "onSoftKey" "é"}} class="key">é</button>

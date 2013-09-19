@@ -33,11 +33,13 @@ App.Segment = DS.Model.extend({
     text: DS.attr('string'),
     start: DS.attr(),
     end: DS.attr(),
-    translation: DS.attr('string')
+    translation: DS.attr('string'),
+    widthStyle : function() {
+        return 'width: 200px';
+    }
 });
 
 App.VideoController = Ember.ObjectController.extend({
-    nextCutoff: 0,
     cutoff: 6,
     sourceProgress: 0,
     time: 0,
@@ -141,11 +143,9 @@ App.VideoController = Ember.ObjectController.extend({
         //console.log('make new segment', this.get('time'), segment)
         segments.pushObject(segment);
         segment.save();
-        this.set('nextCutoff', this.get('nextCutoff')+this.get('cutoff'));
         this.set('allTranslated', false);
     },
     _playSegment : function(segment) {
-        this.set('nextCutoff', segment.get('end'));
         this.get('media').setCurrentTime(segment.get('start'));
         this.get('media').play();
     }
