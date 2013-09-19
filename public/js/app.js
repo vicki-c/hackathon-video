@@ -99,8 +99,11 @@ App.VideoController = Ember.ObjectController.extend({
                     var segmentProgress = (time - segment.get('start'))/this.get('cutoff');
                     $trans.css('width', Math.min(_SEGMENT_WIDTH, segmentProgress*_SEGMENT_WIDTH));
                 }
-                if($orig.position()) {
+                if($orig.position() && !$orig.data('scrolled')) {
                     $orig.ScrollTo();
+                    $orig.data('scrolled', true);
+
+                    //$orig.find('.popover').css('left', $orig.position().left + 250).show();
                 }
             }
         },
@@ -131,15 +134,16 @@ App.VideoController = Ember.ObjectController.extend({
         },
         startTranslating : function() {
             var segments = this.get('model.segments');
-            var segmentIndex = 0;
+            var segmentIndex = -1;
             segments.forEach(function(segment, index) {
                 segment.set('translating', segment.get('translation') || segment.get('nothingSaid'));
-                if(segment.get('translating')) {
-                    segmentIndex = index+1;
+                if(!segment.get('translating') && segmentIndex < 0) {
+                    segmentIndex = index;
                 }
             });
             segments.setEach('focus', false);
 
+            //console.log('startTranslating', segmentIndex);
             var segment = this.get('model.segments').objectAt(segmentIndex);
             segment.set('translating', true);
             segment.set('focus', true);
@@ -256,6 +260,17 @@ App.TargetSegmentController = Ember.ObjectController.extend({
             format: 'new',
             sentence: this.get('model.text')
         }, function(data) {
+            // hack
+            for(var i = 0; i < data.tokens.length; i++) {
+                if(!data.tokens[i].hint_table) {
+                    continue;
+                }
+                for(var j = 0; j < data.tokens[i].hint_table.rows.length; j++) {
+                    if(j < 5) {
+                        data.tokens[i].hint_table.rows[j].show = true;
+                    }
+                }
+            }
             self.set('hints', data.tokens);
         }, 'jsonp');
     }.observes('model.text')

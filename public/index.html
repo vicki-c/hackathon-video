@@ -97,7 +97,9 @@
                                                 <div {{bind-attr class="view.isShown::hidden :hint"}}style="top: 35px; left: -45px;">
                                                     <ul class="list-hints">
                                                         {{#each rows}}
-                                                            <li>{{#each cells}}{{hint}}{{/each}}</li>
+                                                            {{#if show}}
+                                                                <li>{{#each cells}}{{hint}}{{/each}}</li>
+                                                            {{/if}}
                                                         {{/each}}
                                                         <!--<li>▾</li>-->
                                                     </ul>
