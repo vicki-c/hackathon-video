@@ -19,8 +19,7 @@ App.VideoRoute = Ember.Route.extend({
 
 App.Video = DS.Model.extend({
     videoId: DS.attr('string'),
-    sourceSegments: DS.hasMany('segment'),
-    targetSegments: DS.hasMany('segment'),
+    segments: DS.hasMany('segment'),
     videoUrl: function() {
         return 'http://www.youtube.com/watch?v=' + this.get('videoId')
     }.property('videoId')
@@ -29,7 +28,8 @@ App.Video = DS.Model.extend({
 App.Segment = DS.Model.extend({
     text: DS.attr('string'),
     start: DS.attr(),
-    end: DS.attr()
+    end: DS.attr(),
+    translation: DS.attr('string')
 });
 
 App.VideoController = Ember.ObjectController.extend({
@@ -39,10 +39,10 @@ App.VideoController = Ember.ObjectController.extend({
     time: 0,
     total: 0,
     actions: {
-        canPlay: function(media) {
+        canPlay : function(media) {
             this.set('media', media);
         },
-        timeUpdated: function(media){
+        timeUpdated : function(media){
             var time = media.currentTime;
             this.set('time', time);
             this.set('total', media.duration); // HACK
@@ -51,14 +51,13 @@ App.VideoController = Ember.ObjectController.extend({
                 if(segment) {
                     segment.set('played', true);
                     segment.set('end', time);
-                    console.log('pause')
                     media.pause();
                 } else {
                     this._makeNewSegment();
                 }
             }
         },
-        submitTranscription: function(segment) {
+        submitTranscription : function(segment) {
             if(segment.get('end') <= this.get('time')) {
                 this._makeNewSegment();
             }
@@ -68,11 +67,11 @@ App.VideoController = Ember.ObjectController.extend({
 
             this.get('media').play();
         },
-        replay: function(segment) {
+        replay : function(segment) {
             this.get('media').setCurrentTime(segment.get('start'));
             this.get('media').play();
         },
-        skip: function(segment) {
+        skip : function(segment) {
             if(segment.get('end') <= this.get('time')) {
                 this._makeNewSegment();
             }
@@ -81,10 +80,20 @@ App.VideoController = Ember.ObjectController.extend({
             this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
             
             this.get('media').play();
+        },
+        startTranslating : function() {
+            var segmentIndex = this.get('model.segments').filterBy('translated').length;
+
+            var segment = this.get('model.segments').objectAt(segmentIndex);
+            segment.set('translating', true);
+
+            this.set('nextCutoff', segment.get('end'));
+            this.get('media').setCurrentTime(segment.get('start'));
+            this.get('media').play();
         }
     },
-    _findSegment: function(time) {
-        var segments = this.get('model.sourceSegments');
+    _findSegment : function(time) {
+        var segments = this.get('model.segments');
         var fittingSegments = segments.filter(function(segment, index) {
             return segment.get('start') <= time && (!segment.get('end') || segment.get('end') >= time);
         });
@@ -94,7 +103,7 @@ App.VideoController = Ember.ObjectController.extend({
         return null;
     },
     _makeNewSegment : function() {
-        var segments = this.get('model.sourceSegments');
+        var segments = this.get('model.segments');
         var segment = this.store.createRecord('segment', {
             start: this.get('time')
         });
@@ -104,9 +113,9 @@ App.VideoController = Ember.ObjectController.extend({
     }
 });
 
-App.SegmentController = Ember.ObjectController.extend({
+App.SourceSegmentController = Ember.ObjectController.extend({
     actions: {
-        submitTranscription: function(segment) {
+        submitTranscription : function(segment) {
             segment.set('text', this.get('transcription'));
             segment.set('played', false);
             segment.set('done', true);
@@ -114,7 +123,7 @@ App.SegmentController = Ember.ObjectController.extend({
 
             this.get('target').send('submitTranscription', segment);
         },
-        skip: function(segment) {
+        skip : function(segment) {
             segment.set('played', false);
             //segment.set('done', true);
             this.set('transcription', '');
@@ -122,9 +131,36 @@ App.SegmentController = Ember.ObjectController.extend({
             this.get('target').send('skip', segment);
         }
     },
-    toggleNothingSaid: function() {
+    toggleNothingSaid : function() {
         this.set('transcription', '');
     }.observes('model.nothingSaid')
+});
+
+App.TargetSegmentController = Ember.ObjectController.extend({
+    fetchHints : function() {
+        if(!this.get('model.text')) {
+            return;
+        }
+
+        var self = this;
+        $.get('http://d.duolingo.com/words/hints/fr/en', {
+            format: 'new',
+            sentence: this.get('model.text')
+        }, function(data) {
+            self.set('hints', data.tokens);
+        }, 'jsonp');
+    }.observes('model.text')
+});
+
+App.HintableView = Ember.View.extend({
+    tagName : 'span',
+    classNames : ['hintable'],
+    mouseEnter : function(e) {
+        this.set('isShown', true);
+    },
+    mouseLeave : function(e) {
+        this.set('isShown', false);
+    }
 });
 
 App.VideoPlayerView = Ember.View.extend({

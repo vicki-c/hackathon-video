@@ -41,7 +41,9 @@
                         <div class="relative">
                             <button class="toggle-vkeyboard">éÁ</button>
                             {{textarea placeholder="Type in French" valueBinding="transcription" disabledBinding="nothingSaid"}}
-                            <div class="vkeyboard hidden"><button class="key">é</button><button class="key">Á</button><button class="key">ø</button></div>
+                            {{#if virtualKeyboard}}
+                                <div class="vkeyboard hidden"><button class="key">é</button><button class="key">Á</button><button class="key">ø</button></div>
+                            {{/if}}
                         </div>
                         <div class="secondary-action">
                             <div class="left">
@@ -53,7 +55,9 @@
                         </div>
                         <div class="action">
                             <div class="btn-group left">
-                                <button class="btn blue play-again" {{action "replay" model}}><span class="icon-replay"></span> Play again</button>
+                                <button class="btn blue play-again" {{action "replay" model}}>
+                                    <span class="icon-replay"></span> Play again
+                                </button>
                                 <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
                             </div>
                             <button class="btn green right" {{action "submitTranscription" model}}>Submit</button>
@@ -67,41 +71,46 @@
         </script>
         
         <script type="text/x-handlebars" data-template-name="target-segment">
-            <li class="track-segment recorded" style="width: 200px;">
-                {{#if done}}
-                    <div class="popover" style="top: -80px; left: 350px;">
-                        <div class="close"></div>
-                        <h1>Translate into English</h1>
-                        <h2 class="">
-                            <span class="hintable">La</span>
-                            <span class="hintable">
-                                fille
-                                <div class="hint" style="display: block; top: 35px; left: -45px;">
-                                    <ul class="list-hints">
-                                        <li>Girl</li>
-                                        <li>Woman</li>
-                                        <li>Girly</li>
-                                        <li>▾</li>
-                                    </ul>
+            {{#if translating}}
+                <li class="track-segment recorded" style="width: 200px;">
+                    {{#if done}}
+                        <div class="popover" style="top: -80px; left: 350px;">
+                            <div class="close"></div>
+                            <h1>Translate into English</h1>
+                            <h2 class="">
+                                {{#unless hints}}
+                                    {{text}}
+                                {{/unless}}
+                                {{#each hints}}
+                                    {{#view App.HintableView}}
+                                        {{value}}
+                                        {{#with hint_table}}
+                                            <div {{bind-attr class="view.isShown::hidden :hint"}}style="top: 35px; left: -45px;">
+                                                <ul class="list-hints">
+                                                    {{#each rows}}
+                                                        <li>{{#each cells}}{{hint}}{{/each}}</li>
+                                                    {{/each}}
+                                                    <!--<li>▾</li>-->
+                                                </ul>
+                                            </div>
+                                        {{/with}}
+                                    {{/view}}
+                                {{/each}}
+                            </h2>
+                            <textarea placeholder="Type in French"></textarea>
+                            <div class="action">
+                                <div class="btn-group left">
+                                    <button class="btn blue play-again" {{action "replay" model}}>
+                                        <span class="icon-replay"></span> Play again
+                                    </button>
+                                    <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
                                 </div>
-                            </span>
-                            <span class="hintable">mange</span>
-                            <span class="hintable">une</span>
-                            <span class="hintable">pomme</span>
-                        </h2>
-                        <textarea placeholder="Type in French"></textarea>
-                        <div class="action">
-                            <div class="btn-group left">
-                                <button class="btn blue play-again"><span class="icon-replay"></span> Play again</button>
-                                <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
+                                <button class="btn green right" disabled="disabled">Submit</button>
                             </div>
-                            <button class="btn green right" disabled="disabled">Submit</button>
                         </div>
-                    </div>
-                {{/if}}
-                <div class="text"><p><button class="btn orange">Start translating</button></p></div>
-                }
-            </li>
+                    {{/if}}
+                </li>
+            {{/if}}
         </script>
 
         <script type="text/x-handlebars" data-template-name="video">
@@ -119,21 +128,29 @@
                     <ul class="language-track-list">
                         <li class="language-track original">
                             <ul class="track-segments">
-                                {{#each segment in sourceSegments}}
+                                {{#each segment in segments}}
                                     {{render 'source-segment' segment}}
                                 {{/each}}
-                                <li class="track-segment empty">
-                                    <div class="text"><p><button class="btn blue">Start transcribing</button></p></div>
+                                <li class="track-segment" style="width: 200px;">
+                                    <div class="text">
+                                        <p>
+                                            <button class="btn blue">Start transcribing</button>
+                                        </p>
+                                    </div>
                                 </li>
                             </ul>
                         </li>
                         <li class="language-track translation">
                             <ul class="track-segments">
-                                {{#each segment in targetSegments}}
+                                {{#each segment in segments}}
                                     {{render 'target-segment' segment}}
                                 {{/each}}
-                                <li class="track-segment empty" style="width: 200px;">
-                                    <div class="text"><p><button class="btn orange">Start translating</button></p></div>
+                                <li class="track-segment" style="width: 200px;">
+                                    <div class="text">
+                                        <p>
+                                            <button {{action "startTranslating"}} class="btn orange">Start translating</button>
+                                        </p>
+                                    </div>
                                 </li>
                                 
                             </ul>
