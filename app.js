@@ -14,6 +14,11 @@ app.use(express.logger('dev'));
 
 app.use(express.static(__dirname + '/public'));
 
+app.engine('.html', require('ejs').renderFile);
+
+app.get('/', function (req, res) {
+    res.render(__dirname + '/index.html');
+});
 // this examples does not have any routes, however
 // you may `app.use(app.router)` before or after these
 // static() middleware. If placed before them your routes
