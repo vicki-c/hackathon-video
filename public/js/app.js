@@ -110,13 +110,13 @@ App.VideoController = Ember.ObjectController.extend({
         },
         startTranslating : function() {
             var segments = this.get('model.segments');
-            var segmentIndex = -1;
+            var segmentIndex = 0;
             segments.forEach(function(segment, index) {
                 segment.set('translating', segment.get('translation') || segment.get('nothingSaid'));
                 if(segment.get('translating')) {
                     segmentIndex = index+1;
                 }
-            }).length;
+            });
             segments.setEach('focus', false);
 
             var segment = this.get('model.segments').objectAt(segmentIndex);
