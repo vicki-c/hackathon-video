@@ -38,6 +38,7 @@ App.VideoController = Ember.ObjectController.extend({
     sourceProgress: 0,
     time: 0,
     total: 0,
+    allTranslated: true,
     actions: {
         canPlay : function(media) {
             this.set('media', media);
@@ -46,10 +47,11 @@ App.VideoController = Ember.ObjectController.extend({
             var time = media.currentTime;
             this.set('time', time);
             this.set('total', media.duration); // HACK
-            if(time > this.get('nextCutoff')) {
-                var segment = this._findSegment(time);
+
+            var segment = this._findSegment(time);
+            if(!segment || time > (this.get('cutoff') + segment.get('start'))) {
+                //console.log(time, segment);
                 if(segment) {
-                    segment.set('played', true);
                     segment.set('end', time);
                     media.pause();
                 } else {
@@ -82,48 +84,74 @@ App.VideoController = Ember.ObjectController.extend({
             this.get('media').play();
         },
         startTranslating : function() {
-            var segmentIndex = this.get('model.segments').filterBy('translated').length;
+            var segments = this.get('model.segments');
+            var segmentIndex = segments.filterBy('translation').length;
+            segments.setEach('focus', false);
 
             var segment = this.get('model.segments').objectAt(segmentIndex);
             segment.set('translating', true);
+            segment.set('focus', true);
 
-            this.set('nextCutoff', segment.get('end'));
-            this.get('media').setCurrentTime(segment.get('start'));
-            this.get('media').play();
+            this._playSegment(segment);
+        },
+        submitTranslation : function(segment) {
+            this.set('allTranslated', this.get('model.segments').filterBy('translation').length == this.get('model.segments'));
+        },
+        focusSegment : function(segment) {
+            if(segment.get('focus')) {
+                return;
+            }
+            var segments = this.get('model.segments');
+            segments.setEach('focus', false);
+            segment.set('focus', true);
+            this._playSegment(segment);
         }
     },
     _findSegment : function(time) {
         var segments = this.get('model.segments');
         var fittingSegments = segments.filter(function(segment, index) {
+            //console.log(segment.get('start'), segment.get('end'));
             return segment.get('start') <= time && (!segment.get('end') || segment.get('end') >= time);
         });
-        if(fittingSegments.length == 1) {
-            return fittingSegments.objectAt(0);
+        //console.log(time, segments, fittingSegments);
+        if(fittingSegments.length > 0) {
+            return fittingSegments.objectAt(fittingSegments.length-1);
         }
+        //console.log(time, segments, fittingSegments);
         return null;
     },
     _makeNewSegment : function() {
         var segments = this.get('model.segments');
         var segment = this.store.createRecord('segment', {
-            start: this.get('time')
+            start: this.get('time'),
+            focus: true
         });
+        //console.log('make new segment', this.get('time'), segment)
         segments.pushObject(segment);
         segment.save();
         this.set('nextCutoff', this.get('nextCutoff')+this.get('cutoff'));
+        this.set('allTranslated', false);
+    },
+    _playSegment : function(segment) {
+        this.set('nextCutoff', segment.get('end'));
+        this.get('media').setCurrentTime(segment.get('start'));
+        this.get('media').play();
     }
 });
 
 App.SourceSegmentController = Ember.ObjectController.extend({
     actions: {
         submitTranscription : function(segment) {
-            segment.set('text', this.get('transcription'));
+            //segment.set('text', this.get('transcription'));
             segment.set('played', false);
             segment.set('done', true);
-            this.set('transcription', '');
+            segment.set('focus', false);
+            //this.set('transcription', '');
 
             this.get('target').send('submitTranscription', segment);
         },
         skip : function(segment) {
+            segment.set('text', '');
             segment.set('played', false);
             //segment.set('done', true);
             this.set('transcription', '');
@@ -137,6 +165,17 @@ App.SourceSegmentController = Ember.ObjectController.extend({
 });
 
 App.TargetSegmentController = Ember.ObjectController.extend({
+    actions: {
+        submitTranslation : function(segment) {
+            //segment.set('translation', this.get('translation'));
+            //segment.set('played', false);
+            //segment.set('done', true);
+            segment.set('focus', false);
+            //this.set('translation', '');
+
+            this.get('target').send('submitTranslation', segment);
+        },
+    },
     fetchHints : function() {
         if(!this.get('model.text')) {
             return;
