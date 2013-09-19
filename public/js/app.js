@@ -34,22 +34,77 @@ App.Segment = DS.Model.extend({
 
 App.VideoController = Ember.ObjectController.extend({
     nextCutoff: 0,
-    cutoff: 8,
+    cutoff: 6,
     sourceProgress: 0,
+    time: 0,
+    total: 0,
     actions: {
+        canPlay: function(media) {
+            this.set('media', media);
+            this.set('total', media.duration);
+        },
         timeUpdated: function(media){
-            var time = media.currentTime, total = media.duration;
-            console.log('current: ' + time, total, this.get('model.sourceSegments'));
+            var time = media.currentTime;
+            this.set('time', time);
             if(time > this.get('nextCutoff')) {
-                var segment = this.store.createRecord('segment', {
-                    start: time
-                });
-                this.get('model.sourceSegments').pushObject(segment);
-                segment.save();
-                this.set('nextCutoff', this.get('nextCutoff')+this.get('cutoff'));
-                this.set('sourceProgress', Math.ceil(time*100/total));
+                var segments = this.get('model.sourceSegments');
+
+                var lastSegment = segments.get('lastObject');
+                if(lastSegment) {
+                    lastSegment.set('played', true);
+                    lastSegment.set('end', time);
+                    console.log('pause')
+                    media.pause();
+                } else {
+                    this._makeNewSegment();
+                }
             }
+        },
+        submitTranscription: function(segment) {
+            if(segment.get('end') <= this.get('time')) {
+                this._makeNewSegment();
+            }
+
+            segment.set('text', this.get('transcription'));
+            segment.set('played', false);
+            segment.set('done', true);
+            this.set('transcription', '');
+
+            var progress = Math.ceil(segment.get('end')*100/this.get('total'));
+            this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
+
+            this.get('media').play();
+        },
+        replay: function(segment) {
+            this.get('media').setCurrentTime(segment.get('start'));
+            this.get('media').play();
+        },
+        skip: function(segment) {
+            if(segment.get('end') <= this.get('time')) {
+                this._makeNewSegment();
+            }
+
+            segment.set('played', false);
+            segment.set('done', true);
+            this.set('transcription', '');
+
+            var progress = Math.ceil(segment.get('end')*100/this.get('total'));
+            this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
+            
+            this.get('media').play();
         }
+    },
+    _nextSegment: function() {
+
+    },
+    _makeNewSegment : function() {
+        var segments = this.get('model.sourceSegments');
+        var segment = this.store.createRecord('segment', {
+            start: this.get('time')
+        });
+        segments.pushObject(segment);
+        segment.save();
+        this.set('nextCutoff', this.get('nextCutoff')+this.get('cutoff'));
     }
 });
 
@@ -70,6 +125,11 @@ App.VideoPlayerView = Ember.View.extend({
                 media.addEventListener('timeupdate', function() {
                     // access HTML5-like properties
                     self.get('controller').send('timeUpdated', media);
+                }, false);
+         
+                media.addEventListener('canplay', function() {
+                    // access HTML5-like properties
+                    self.get('controller').send('canPlay', media);
                 }, false);
          
                 // add click events to control player
