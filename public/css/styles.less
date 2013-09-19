@@ -157,6 +157,50 @@ a {
 	}
 }
 
+.toggle-vkeyboard {
+	position: absolute;
+	right: 10px;
+	top: 10px;
+	height: 36px;
+	width: 36px;
+	line-height: 36px;
+	text-align: center;
+	background: white;
+	.box-shadow(0 3px 10px rgba(0,0,0,0.1));
+	.border-radius(30px);
+	color: #4b4b4b;
+	border: none;
+	&:hover {
+		background: @blue;
+		color: white;
+	}
+}
+
+.vkeyboard {
+	background: #e7e7e7;
+	.border-radius(0 0 10px 10px);
+	.box-sizing(border-box);
+	.clearfix();
+	padding: 10px;
+	margin: -25px 0 25px 0;
+	.key {
+		.border-radius(30px);
+		height: 26px;
+		width: 26px;
+		line-height: 26px;
+		.box-shadow(0 2px 7px rgba(0,0,0,0.1));
+		text-align: center;
+		color: #4b4b4b;
+		background: white;
+		border: none;
+		margin: 0 5px 0 0;
+		float: left;
+		&:hover {
+			background: @blue;
+			color: white;
+		}
+	}
+}
 
 .flag {
 	width: 50px;
@@ -182,6 +226,9 @@ a {
 	textarea {
 		width: 100%;
 		margin: 0 0 25px 0;
+		padding-right: 50px;
+		resize:vertical;
+		.border-radius(10px 10px 0 0);
 	}
 	.secondary-action {
 		.clearfix();

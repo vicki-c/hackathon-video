@@ -16,6 +16,18 @@
         <script src="js/app.js"></script>
         <script type="text/javascript" src="http://use.typekit.net/ina1hnt.js"></script>
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+        
+        <script type="text/javascript" charset="utf-8">
+            
+            $(function(){
+                $(".toggle-vkeyboard").click(function() {
+					$(".vkeyboard").toggle();
+					console.log("test");
+				});
+            });    
+            
+        </script>
+        
     </head>
     
     <body>
@@ -42,7 +54,11 @@
                                             <div class="popover" style="top: -80px; left: 350px;">
                                                 <div class="close"></div>
                                                 <h1>Type what you heard</h1>
-                                                {{textarea placeholder="Type in French" valueBinding="transcription"}}
+                                                <div class="relative">
+                                                    <button class="toggle-vkeyboard">éÁ</button>
+                                                    {{textarea placeholder="Type in French" valueBinding="transcription"}}
+                                                    <div class="vkeyboard hidden"><button class="key">é</button><button class="key">Á</button><button class="key">ø</button></div>
+                                                </div>
                                                 <div class="secondary-action">
                                                     <div class="left"><label><input type="checkbox"/> Nothing was said</label></div>
                                                     <div class="right"><a href="" class="skip" {{action "skip" segment}}>Skip segment <span class="icon-next-arrow"></span></a></div>
