@@ -54,7 +54,7 @@ App.VideoController = Ember.ObjectController.extend({
 
             var segment = this._findSegment(time);
             if(!segment || time > (this.get('cutoff') + segment.get('start'))) {
-                //console.log(time, segment);
+                //console.log('timer', time, segment);
                 if(segment) {
                     segment.set('end', time);
                     media.pause();
@@ -89,12 +89,15 @@ App.VideoController = Ember.ObjectController.extend({
         },
         startTranslating : function() {
             var segments = this.get('model.segments');
-            var segmentIndex = segments.filter(function(segment) {
-                return segment.get('translation') || segment.get('nothingSaid');
+            var segmentIndex = -1;
+            segments.forEach(function(segment, index) {
+                segment.set('translating', segment.get('translation') || segment.get('nothingSaid'));
+                if(segment.get('translating')) {
+                    segmentIndex = index+1;
+                }
             }).length;
             segments.setEach('focus', false);
 
-            console.log(segmentIndex)
             var segment = this.get('model.segments').objectAt(segmentIndex);
             segment.set('translating', true);
             segment.set('focus', true);
@@ -163,7 +166,7 @@ App.SourceSegmentController = Ember.ObjectController.extend({
             segment.set('text', '');
             segment.set('played', false);
             //segment.set('done', true);
-            this.set('transcription', '');
+            //this.set('transcription', '');
 
             this.get('target').send('skipTranscription', segment);
         },
@@ -175,13 +178,13 @@ App.SourceSegmentController = Ember.ObjectController.extend({
         },
         onSoftKey : function(c) {
             // BIG HACK
-            $('#translation').insertAtCaret(c);
+            $('name=["transcription"]').insertAtCaret(c);
         }
     },
     toggleNothingSaid : function() {
         if(this.get('model.nothingSaid')) {
-            this.get('model').set('transcription', '');
-            this.get('model').set('translating', true);
+            //this.get('model').set('transcription', '');
+            //this.get('model').set('translating', true);
         }
     }.observes('model.nothingSaid')
 });
@@ -233,6 +236,7 @@ App.VideoPlayerView = Ember.View.extend({
         var self = this;
         var player = new MediaElementPlayer('#player', {
             alwaysShowControls: true,
+            enableKeyboard: false,
             features: ['playpause','current','progress'],
             
             success: function(media, domNode, player) {
