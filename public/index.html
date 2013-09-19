@@ -13,7 +13,7 @@
         <script src="js/libs/handlebars-1.0.0.js" type="text/javascript"></script>
         <script src="js/libs/ember-1.0.0.js"></script>
         <script src="js/libs/ember-data.js"></script>
-        <script src="js/libs/jquery-scrollto.js"></script>
+        <script src="js/libs/jquery.scrollTo.js"></script>
         <script src="js/app.js"></script>
         <script type="text/javascript" src="http://use.typekit.net/ina1hnt.js"></script>
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
@@ -35,7 +35,7 @@
         <script type="text/x-handlebars" data-template-name="source-segment">
             <li {{bind-attr id="id"}} {{bind-attr class="done:recorded:recording :track-segment"}} style="width: 0px;">
                 {{#if focus}}
-                    <div class="popover" style="top: -80px; left: 350px;">
+                    <div class="popover" style="top: -80px; left: 350px; z-index: 100;">
                         <div {{action "close"}} class="close"></div>
                         <h1>Type what you heard</h1>
                         <div class="relative">
@@ -83,7 +83,7 @@
                             <p>{{translation}}</p>
                         </div>
                         {{#if focus}}
-                            <div class="popover" style="top: -80px; left: 350px;">
+                            <div class="popover" style="top: -80px; left: 350px; z-index: 100;">
                                 <div {{action "close"}} class="close"></div>
                                 <h1>Translate into {{targetLanguageName}}</h1>
                                 <h2 class="">

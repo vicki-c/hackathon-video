@@ -100,10 +100,25 @@ App.VideoController = Ember.ObjectController.extend({
                     $trans.css('width', Math.min(_SEGMENT_WIDTH, segmentProgress*_SEGMENT_WIDTH));
                 }
                 if($orig.position() && !$orig.data('scrolled')) {
-                    $orig.ScrollTo();
+                    $('.language-track-list').scrollTo($orig, {
+                        onAfter: function() {
+                            var x = $orig.position().left;
+                            var w = $orig.parent().width();
+                            if(x > w/2) {
+                                $orig.find('.popover').css('left', $orig.position().left - 450).show();
+                                if($trans.find('.popover').size() > 0) {
+                                    $trans.find('.popover').css('left', $trans.position().left - 450).show();
+                                }
+                            } else {
+                                $orig.find('.popover').css('left', $orig.position().left + 250).show();
+                                if($trans.find('.popover').size() > 0) {
+                                    $trans.find('.popover').css('left', $trans.position().left + 250).show();
+                                }
+                            }
+                        }
+                    });
+                    //$orig.ScrollTo();
                     $orig.data('scrolled', true);
-
-                    //$orig.find('.popover').css('left', $orig.position().left + 250).show();
                 }
             }
         },
@@ -111,6 +126,10 @@ App.VideoController = Ember.ObjectController.extend({
             if(segment.get('end') <= this.get('time')) {
                 this._makeNewSegment();
             }
+
+            // HACK
+            $('.original #'+segment.id).data('scrolled', undefined);
+            $('.translation #'+segment.id).data('scrolled', undefined);
 
             var progress = Math.ceil(segment.get('end')*100/this.get('total'));
             this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
@@ -126,6 +145,10 @@ App.VideoController = Ember.ObjectController.extend({
             if(segment.get('end') <= this.get('time')) {
                 this._makeNewSegment();
             }
+
+            // HACK
+            $('.original #'+segment.id).data('scrolled', undefined);
+            $('.translation #'+segment.id).data('scrolled', undefined);
 
             var progress = Math.ceil(segment.get('end')*100/this.get('total'));
             this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
@@ -151,7 +174,12 @@ App.VideoController = Ember.ObjectController.extend({
             this._playSegment(segment);
         },
         submitTranslation : function(segment) {
-            this.set('allTranslated', this.get('model.segments').filterBy('translation').length == this.get('model.segments'));
+            this.set('allTranslated', !this.get('model.segments').any(function(seg) {
+                return (!seg.get('translation') && !seg.get('nothingSaid'));
+            }));
+            // HACK
+            $('.original #'+segment.id).data('scrolled', undefined);
+            $('.translation #'+segment.id).data('scrolled', undefined);
         },
         focusSegment : function(segment) {
             if(segment.get('focus')) {
