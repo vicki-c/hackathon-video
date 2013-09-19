@@ -82,7 +82,13 @@ a {
 		&.translation {
 			.track-segment {
 				border-right: 2px solid @orange;
-				background: #ffe1a4;
+				//background: #ffe1a4;
+				.btn {
+					&[disabled] {
+						background: #e6e6e6;
+						color: #d2d2d2;
+					}
+				}
 				&.recorded {
 					
 					&:hover {

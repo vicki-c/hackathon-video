@@ -131,7 +131,7 @@
                                 {{#each segment in segments}}
                                     {{render 'source-segment' segment}}
                                 {{/each}}
-                                <li class="track-segment" style="width: 200px;">
+                                <li class="track-segment empty">
                                     <div class="text">
                                         <p>
                                             <button class="btn blue">Start transcribing</button>
@@ -145,10 +145,10 @@
                                 {{#each segment in segments}}
                                     {{render 'target-segment' segment}}
                                 {{/each}}
-                                <li class="track-segment" style="width: 200px;">
+                                <li class="track-segment empty">
                                     <div class="text">
                                         <p>
-                                            <button {{action "startTranslating"}} class="btn orange">Start translating</button>
+                                            <button {{action "startTranslating"}} class="btn orange" disabled>Start translating</button>
                                         </p>
                                     </div>
                                 </li>
