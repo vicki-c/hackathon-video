@@ -157,6 +157,9 @@ App.SourceSegmentController = Ember.ObjectController.extend({
             this.set('transcription', '');
 
             this.get('target').send('skip', segment);
+        },
+        close : function() {
+            this.set('focus', false);
         }
     },
     toggleNothingSaid : function() {
@@ -175,6 +178,9 @@ App.TargetSegmentController = Ember.ObjectController.extend({
 
             this.get('target').send('submitTranslation', segment);
         },
+        close : function() {
+            this.set('focus', false);
+        }
     },
     fetchHints : function() {
         if(!this.get('model.text')) {

@@ -36,7 +36,7 @@
             <li {{bind-attr class="done:recorded:recording :track-segment"}} style="width: 200px;">
                 {{#if focus}}
                     <div class="popover" style="top: -80px; left: 350px;">
-                        <div class="close"></div>
+                        <div {{action "close"}} class="close"></div>
                         <h1>Type what you heard</h1>
                         <div class="relative">
                             <button class="toggle-vkeyboard">éÁ</button>
@@ -78,7 +78,7 @@
                     {{/if}}
                     {{#if focus}}
                         <div class="popover" style="top: -80px; left: 350px;">
-                            <div class="close"></div>
+                            <div {{action "close"}} class="close"></div>
                             <h1>Translate into English</h1>
                             <h2 class="">
                                 {{#unless hints}}
