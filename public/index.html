@@ -43,7 +43,7 @@
         </script>
         
         <script type="text/x-handlebars" data-template-name="source-segment">
-            <li {{bind-attr class="done:recorded:recording :track-segment"}} style="width: 200px;">
+            <li {{bind-attr id="id"}} {{bind-attr class="done:recorded:recording :track-segment"}} style="width: 0px;">
                 {{#if focus}}
                     <div class="popover" style="top: -80px; left: 350px;">
                         <div {{action "close"}} class="close"></div>

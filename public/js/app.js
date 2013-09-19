@@ -61,8 +61,13 @@ App.VideoController = Ember.ObjectController.extend({
                     segment.set('end', time);
                     media.pause();
                 } else {
-                    this._makeNewSegment();
+                    segment = this._makeNewSegment();
                 }
+            }
+            if(segment) {
+                // HACK
+                var segmentProgress = (time - segment.get('start'))/this.get('cutoff');
+                $('#'+segment.id).css('width', Math.max(1, segmentProgress*200));
             }
         },
         submitTranscription : function(segment) {
@@ -144,6 +149,8 @@ App.VideoController = Ember.ObjectController.extend({
         segments.pushObject(segment);
         segment.save();
         this.set('allTranslated', false);
+
+        return segment;
     },
     _playSegment : function(segment) {
         this.get('media').setCurrentTime(segment.get('start'));
