@@ -47,12 +47,10 @@ App.VideoController = Ember.ObjectController.extend({
             this.set('time', time);
             this.set('total', media.duration); // HACK
             if(time > this.get('nextCutoff')) {
-                var segments = this.get('model.sourceSegments');
-
-                var lastSegment = segments.get('lastObject');
-                if(lastSegment) {
-                    lastSegment.set('played', true);
-                    lastSegment.set('end', time);
+                var segment = this._findSegment(time);
+                if(segment) {
+                    segment.set('played', true);
+                    segment.set('end', time);
                     console.log('pause')
                     media.pause();
                 } else {
@@ -85,8 +83,15 @@ App.VideoController = Ember.ObjectController.extend({
             this.get('media').play();
         }
     },
-    _nextSegment: function() {
-
+    _findSegment: function(time) {
+        var segments = this.get('model.sourceSegments');
+        var fittingSegments = segments.filter(function(segment, index) {
+            return segment.get('start') <= time && (!segment.get('end') || segment.get('end') >= time);
+        });
+        if(fittingSegments.length == 1) {
+            return fittingSegments.objectAt(0);
+        }
+        return null;
     },
     _makeNewSegment : function() {
         var segments = this.get('model.sourceSegments');
@@ -111,12 +116,15 @@ App.SegmentController = Ember.ObjectController.extend({
         },
         skip: function(segment) {
             segment.set('played', false);
-            segment.set('done', true);
+            //segment.set('done', true);
             this.set('transcription', '');
 
             this.get('target').send('skip', segment);
         }
-    }
+    },
+    toggleNothingSaid: function() {
+        this.set('transcription', '');
+    }.observes('model.nothingSaid')
 });
 
 App.VideoPlayerView = Ember.View.extend({
