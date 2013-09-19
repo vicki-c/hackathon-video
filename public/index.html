@@ -39,10 +39,14 @@
                         <div {{action "close"}} class="close"></div>
                         <h1>Type what you heard</h1>
                         <div class="relative">
-                            <button class="toggle-vkeyboard">éÁ</button>
-                            {{textarea placeholder="Type in French" valueBinding="model.text" disabledBinding="nothingSaid"}}
+                            <button {{action "toggleKeyboard"}} class="toggle-vkeyboard">éÁ</button>
+                            {{textarea id="translation" placeholder="Type in French" valueBinding="model.text" disabledBinding="nothingSaid"}}
                             {{#if virtualKeyboard}}
-                                <div class="vkeyboard hidden"><button class="key">é</button><button class="key">Á</button><button class="key">ø</button></div>
+                                <div class="vkeyboard">
+                                    <button {{action "onSoftKey" "é"}} class="key">é</button>
+                                    <button {{action "onSoftKey" "Á"}} class="key">Á</button>
+                                    <button {{action "onSoftKey" "ø"}} class="key">ø</button>
+                                </div>
                             {{/if}}
                         </div>
                         <div class="secondary-action">
