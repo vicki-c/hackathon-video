@@ -16,6 +16,18 @@
         <script src="js/app.js"></script>
         <script type="text/javascript" src="http://use.typekit.net/ina1hnt.js"></script>
         <script type="text/javascript">try{Typekit.load();}catch(e){}</script>
+        
+        <script type="text/javascript" charset="utf-8">
+            
+            $(function(){
+                $(".toggle-vkeyboard").click(function() {
+					$(".vkeyboard").toggle();
+					console.log("test");
+				});
+            });    
+            
+        </script>
+        
     </head>
     
     <body>
@@ -26,7 +38,11 @@
                     <div class="popover" style="top: -80px; left: 350px;">
                         <div class="close"></div>
                         <h1>Type what you heard</h1>
-                        {{textarea placeholder="Type in French" valueBinding="transcription" disabledBinding="nothingSaid"}}
+                        <div class="relative">
+                            <button class="toggle-vkeyboard">éÁ</button>
+                            {{textarea placeholder="Type in French" valueBinding="transcription" disabledBinding="nothingSaid"}}
+                            <div class="vkeyboard hidden"><button class="key">é</button><button class="key">Á</button><button class="key">ø</button></div>
+                        </div>
                         <div class="secondary-action">
                             <div class="left">
                                 <label>
@@ -74,7 +90,6 @@
                             <span class="hintable">pomme</span>
                         </h2>
                         <textarea placeholder="Type in French"></textarea>
-                        
                         <div class="action">
                             <div class="btn-group left">
                                 <button class="btn blue play-again"><span class="icon-replay"></span> Play again</button>
@@ -84,6 +99,8 @@
                         </div>
                     </div>
                 {{/if}}
+                <div class="text"><p><button class="btn orange">Start translating</button></p></div>
+                }
             </li>
         </script>
 
