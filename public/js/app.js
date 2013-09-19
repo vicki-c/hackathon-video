@@ -42,6 +42,7 @@ App.Segment = DS.Model.extend({
     start: DS.attr(),
     end: DS.attr(),
     translation: DS.attr('string'),
+    nothingSaid: DS.attr(),
     widthStyle : function() {
         return 'width: 200px';
     },
@@ -50,7 +51,10 @@ App.Segment = DS.Model.extend({
     }.property('sourceLanguage'),
     targetLanguageName: function() {
         return _LANGUAGES[this.get('targetLanguage')];
-    }.property('targetLanguage')
+    }.property('targetLanguage'),
+    transcribed: function() {
+        return this.get('text') || this.get('nothingSaid');
+    }.property('text', 'nothingSaid')
 });
 
 var _SEGMENT_WIDTH = 200;
@@ -68,9 +72,15 @@ App.VideoController = Ember.ObjectController.extend({
     time: 0,
     total: 0,
     allTranslated: true,
+    playing: false,
+    inputting: false,
     actions: {
         canPlay : function(media) {
             this.set('media', media);
+        },
+        playing : function() {
+            this.set('playing', true);
+            this.set('inputting', false);
         },
         timeUpdated : function(media){
             var time = media.currentTime;
@@ -83,6 +93,9 @@ App.VideoController = Ember.ObjectController.extend({
                 if(segment) {
                     segment.set('end', time);
                     media.pause();
+
+                    this.set('playing', false);
+                    this.set('inputting', true);
                 } else {
                     segment = this._makeNewSegment();
                 }
@@ -122,6 +135,13 @@ App.VideoController = Ember.ObjectController.extend({
                 }
             }
         },
+        startTranscribing : function() {
+            var segments = this.get('model.segments');
+            if(segments.get('lastObject')) {
+                this.get('media').setCurrentTime(segments.get('lastObject').get('start'));
+            }
+            this.get('media').play();
+        },
         submitTranscription : function(segment) {
             if(segment.get('end') <= this.get('time')) {
                 this._makeNewSegment();
@@ -133,7 +153,10 @@ App.VideoController = Ember.ObjectController.extend({
 
             var progress = Math.ceil(segment.get('end')*100/this.get('total'));
             this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
-            console.log(this.get('total'), segment.get('end'))
+
+            this.set('allTranslated', !this.get('model.segments').any(function(seg) {
+                return (seg.get('text') && !seg.get('translation') && !seg.get('nothingSaid'));
+            }));
 
             this.get('media').play();
         },
@@ -180,6 +203,10 @@ App.VideoController = Ember.ObjectController.extend({
             // HACK
             $('.original #'+segment.id).data('scrolled', undefined);
             $('.translation #'+segment.id).data('scrolled', undefined);
+
+            this.set('allTranslated', !this.get('model.segments').any(function(seg) {
+                return (seg.get('text') && !seg.get('translation') && !seg.get('nothingSaid'));
+            }));
         },
         focusSegment : function(segment) {
             if(segment.get('focus')) {
@@ -215,7 +242,7 @@ App.VideoController = Ember.ObjectController.extend({
         //console.log('make new segment', this.get('time'), segment)
         segments.pushObject(segment);
         segment.save();
-        this.set('allTranslated', false);
+        //this.set('allTranslated', false);
 
         return segment;
     },
@@ -328,6 +355,7 @@ App.VideoPlayerView = Ember.View.extend({
                 // add HTML5 events to the YouTube API media object
                 media.addEventListener('play', function() {
                     console.log('yeah, it is playing!');
+                    self.get('controller').send('playing', media);
                 }, false);
          
                 media.addEventListener('timeupdate', function() {

@@ -33,9 +33,9 @@
         </script>
         
         <script type="text/x-handlebars" data-template-name="source-segment">
-            <li {{bind-attr id="id"}} {{bind-attr class="done:recorded:recording :track-segment"}} style="width: 0px;">
+            <li {{bind-attr id="id"}} {{bind-attr class="transcribed:recorded:recording :track-segment"}} style="width: 0px;">
                 {{#if focus}}
-                    <div class="popover" style="top: -80px; left: 350px; z-index: 100;">
+                    <div {{bind-attr class=":popover"}} style="top: -80px; left: 350px; z-index: 100;">
                         <div {{action "close"}} class="close"></div>
                         <h1>Type what you heard</h1>
                         <div class="relative">
@@ -68,7 +68,9 @@
                         </div>
                     </div>
                 {{/if}}
-                <div {{action "focusSegment" model}} class="text"><p>{{text}}</p></div>
+                <div {{action "focusSegment" model}} class="text">
+                    <p>{{#if nothingSaid}}(...){{else}}{{text}}{{/if}}</p>
+                </div>
             </li>
         </script>
         
@@ -80,7 +82,7 @@
                 {{else}}
                     <li {{bind-attr id="id"}} class="track-segment recorded" style="width: 0px;">
                         <div {{action "focusSegment" model}} class="text">
-                            <p>{{translation}}</p>
+                            <p>{{#if nothingSaid}}(...){{else}}{{translation}}{{/if}}</p>
                         </div>
                         {{#if focus}}
                             <div class="popover" style="top: -80px; left: 350px; z-index: 100;">
@@ -146,7 +148,7 @@
                                 <li class="track-segment empty">
                                     <div class="text">
                                         <p>
-                                            <button class="btn blue">Start transcribing</button>
+                                            <button {{action "startTranscribing"}} {{bind-attr class="playing:hidden :btn :blue"}}>Start transcribing</button>
                                         </p>
                                     </div>
                                 </li>
