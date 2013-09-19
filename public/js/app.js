@@ -41,18 +41,16 @@ App.VideoController = Ember.ObjectController.extend({
     actions: {
         canPlay: function(media) {
             this.set('media', media);
-            this.set('total', media.duration);
         },
         timeUpdated: function(media){
             var time = media.currentTime;
             this.set('time', time);
+            this.set('total', media.duration); // HACK
             if(time > this.get('nextCutoff')) {
-                var segments = this.get('model.sourceSegments');
-
-                var lastSegment = segments.get('lastObject');
-                if(lastSegment) {
-                    lastSegment.set('played', true);
-                    lastSegment.set('end', time);
+                var segment = this._findSegment(time);
+                if(segment) {
+                    segment.set('played', true);
+                    segment.set('end', time);
                     console.log('pause')
                     media.pause();
                 } else {
@@ -64,11 +62,6 @@ App.VideoController = Ember.ObjectController.extend({
             if(segment.get('end') <= this.get('time')) {
                 this._makeNewSegment();
             }
-
-            segment.set('text', this.get('transcription'));
-            segment.set('played', false);
-            segment.set('done', true);
-            this.set('transcription', '');
 
             var progress = Math.ceil(segment.get('end')*100/this.get('total'));
             this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
@@ -84,18 +77,21 @@ App.VideoController = Ember.ObjectController.extend({
                 this._makeNewSegment();
             }
 
-            segment.set('played', false);
-            segment.set('done', true);
-            this.set('transcription', '');
-
             var progress = Math.ceil(segment.get('end')*100/this.get('total'));
             this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
             
             this.get('media').play();
         }
     },
-    _nextSegment: function() {
-
+    _findSegment: function(time) {
+        var segments = this.get('model.sourceSegments');
+        var fittingSegments = segments.filter(function(segment, index) {
+            return segment.get('start') <= time && (!segment.get('end') || segment.get('end') >= time);
+        });
+        if(fittingSegments.length == 1) {
+            return fittingSegments.objectAt(0);
+        }
+        return null;
     },
     _makeNewSegment : function() {
         var segments = this.get('model.sourceSegments');
@@ -106,6 +102,29 @@ App.VideoController = Ember.ObjectController.extend({
         segment.save();
         this.set('nextCutoff', this.get('nextCutoff')+this.get('cutoff'));
     }
+});
+
+App.SegmentController = Ember.ObjectController.extend({
+    actions: {
+        submitTranscription: function(segment) {
+            segment.set('text', this.get('transcription'));
+            segment.set('played', false);
+            segment.set('done', true);
+            this.set('transcription', '');
+
+            this.get('target').send('submitTranscription', segment);
+        },
+        skip: function(segment) {
+            segment.set('played', false);
+            //segment.set('done', true);
+            this.set('transcription', '');
+
+            this.get('target').send('skip', segment);
+        }
+    },
+    toggleNothingSaid: function() {
+        this.set('transcription', '');
+    }.observes('model.nothingSaid')
 });
 
 App.VideoPlayerView = Ember.View.extend({
@@ -131,7 +150,7 @@ App.VideoPlayerView = Ember.View.extend({
                     // access HTML5-like properties
                     self.get('controller').send('canPlay', media);
                 }, false);
-         
+
                 // add click events to control player
                 myMuteButton.addEventListener('click', function() {
                     // HTML5 has a "muted" setter, but we have to use a function here
