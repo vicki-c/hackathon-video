@@ -71,12 +71,15 @@ App.VideoController = Ember.ObjectController.extend({
                 var $orig = $('.original #'+segment.id);
                 if($orig.width() < _SEGMENT_WIDTH) {
                     var segmentProgress = (time - segment.get('start'))/this.get('cutoff');
-                    $orig.css('width', Math.max(_SEGMENT_WIDTH, segmentProgress*_SEGMENT_WIDTH));
+                    $orig.css('width', Math.min(_SEGMENT_WIDTH, segmentProgress*_SEGMENT_WIDTH));
                 }
                 var $trans = $('.translation #'+segment.id);
                 if($trans.width() < _SEGMENT_WIDTH) {
                     var segmentProgress = (time - segment.get('start'))/this.get('cutoff');
-                    $trans.css('width', Math.max(_SEGMENT_WIDTH, segmentProgress*_SEGMENT_WIDTH));
+                    $trans.css('width', Math.min(_SEGMENT_WIDTH, segmentProgress*_SEGMENT_WIDTH));
+                }
+                if($orig.position()) {
+                    $orig.ScrollTo();
                 }
             }
         },
@@ -87,6 +90,7 @@ App.VideoController = Ember.ObjectController.extend({
 
             var progress = Math.ceil(segment.get('end')*100/this.get('total'));
             this.set('sourceProgress', Math.max(this.get('sourceProgress'), progress));
+            console.log(this.get('total'), segment.get('end'))
 
             this.get('media').play();
         },
