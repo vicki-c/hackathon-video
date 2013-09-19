@@ -25,25 +25,46 @@ App.Video = DS.Model.extend({
     targetLanguage: DS.attr('string'),
     segments: DS.hasMany('segment'),
     videoUrl: function() {
-        return 'http://www.youtube.com/watch?v=' + this.get('videoId')
-    }.property('videoId')
+        return 'http://www.youtube.com/watch?v=' + this.get('videoId');
+    }.property('videoId'),
+    sourceLanguageName: function() {
+        return _LANGUAGES[this.get('sourceLanguage')];
+    }.property('sourceLanguage'),
+    targetLanguageName: function() {
+        return _LANGUAGES[this.get('targetLanguage')];
+    }.property('targetLanguage')
 });
 
 App.Segment = DS.Model.extend({
     text: DS.attr('string'),
+    sourceLanguage: DS.attr('string'),
+    targetLanguage: DS.attr('string'),
     start: DS.attr(),
     end: DS.attr(),
     translation: DS.attr('string'),
     widthStyle : function() {
         return 'width: 200px';
-    }
+    },
+    sourceLanguageName: function() {
+        return _LANGUAGES[this.get('sourceLanguage')];
+    }.property('sourceLanguage'),
+    targetLanguageName: function() {
+        return _LANGUAGES[this.get('targetLanguage')];
+    }.property('targetLanguage')
 });
 
 var _SEGMENT_WIDTH = 200;
+var _LANGUAGES = {
+    es: 'Spanish',
+    en: 'English',
+    fr: 'French',
+    de: 'German'
+}
 
 App.VideoController = Ember.ObjectController.extend({
     cutoff: 6,
     sourceProgress: 0,
+    targetProgress: 0,
     time: 0,
     total: 0,
     allTranslated: true,
