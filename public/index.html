@@ -31,6 +31,16 @@
     </head>
     
     <body>
+
+        <script type="text/x-handlebars" data-template-name="index">
+            <div id="container">
+                <h1>Hackathon: Video Transcription/Translation</h1>
+                <ul>
+                    <li><a href="#/fr/en/uq4OFEwflnI">Thor trailer in French</a></li>
+                    <li><a href="#/es/en/Dos2w0C3LP0">Thor trailer in Spanish</a></li>
+                </ul>
+            </div>
+        </script>
         
         <script type="text/x-handlebars" data-template-name="source-segment">
             <li {{bind-attr class="done:recorded:recording :track-segment"}} style="width: 200px;">
@@ -55,7 +65,7 @@
                                     {{input type="checkbox" checked=nothingSaid}} Nothing was said
                                 </label>
                             </div>
-                            <div class="right"><a href="" class="skip" {{action "skip" model}}>Skip segment <span class="icon-next-arrow"></span></a></div>
+                            <div class="right"><a href="" class="skip" {{action "skipTranscription" model}}>Skip segment <span class="icon-next-arrow"></span></a></div>
                         </div>
                         <div class="action">
                             <div class="btn-group left">
@@ -75,47 +85,49 @@
         <script type="text/x-handlebars" data-template-name="target-segment">
             {{#if translating}}
                 <li class="track-segment recorded" style="width: 200px;">
-                    {{#if translation}}
-                        <div {{action "focusSegment" model}} class="text">
-                            <p>{{translation}}</p>
-                        </div>
-                    {{/if}}
-                    {{#if focus}}
-                        <div class="popover" style="top: -80px; left: 350px;">
-                            <div {{action "close"}} class="close"></div>
-                            <h1>Translate into English</h1>
-                            <h2 class="">
-                                {{#unless hints}}
-                                    {{text}}
-                                {{/unless}}
-                                {{#each hints}}
-                                    {{#view App.HintableView}}
-                                        {{value}}
-                                        {{#with hint_table}}
-                                            <div {{bind-attr class="view.isShown::hidden :hint"}}style="top: 35px; left: -45px;">
-                                                <ul class="list-hints">
-                                                    {{#each rows}}
-                                                        <li>{{#each cells}}{{hint}}{{/each}}</li>
-                                                    {{/each}}
-                                                    <!--<li>▾</li>-->
-                                                </ul>
-                                            </div>
-                                        {{/with}}
-                                    {{/view}}
-                                {{/each}}
-                            </h2>
-                            {{textarea placeholder="Type in English" valueBinding="model.translation"}}
-                            <div class="action">
-                                <div class="btn-group left">
-                                    <button class="btn blue play-again" {{action "replay" model}}>
-                                        <span class="icon-replay"></span> Play again
-                                    </button>
-                                    <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
-                                </div>
-                                <button class="btn green right" {{action "submitTranslation" model}}>Submit</button>
+                    {{#unless nothingSaid}}
+                        {{#if translation}}
+                            <div {{action "focusSegment" model}} class="text">
+                                <p>{{translation}}</p>
                             </div>
-                        </div>
-                    {{/if}}
+                        {{/if}}
+                        {{#if focus}}
+                            <div class="popover" style="top: -80px; left: 350px;">
+                                <div {{action "close"}} class="close"></div>
+                                <h1>Translate into English</h1>
+                                <h2 class="">
+                                    {{#unless hints}}
+                                        {{text}}
+                                    {{/unless}}
+                                    {{#each hints}}
+                                        {{#view App.HintableView}}
+                                            {{value}}
+                                            {{#with hint_table}}
+                                                <div {{bind-attr class="view.isShown::hidden :hint"}}style="top: 35px; left: -45px;">
+                                                    <ul class="list-hints">
+                                                        {{#each rows}}
+                                                            <li>{{#each cells}}{{hint}}{{/each}}</li>
+                                                        {{/each}}
+                                                        <!--<li>▾</li>-->
+                                                    </ul>
+                                                </div>
+                                            {{/with}}
+                                        {{/view}}
+                                    {{/each}}
+                                </h2>
+                                {{textarea placeholder="Type in English" valueBinding="model.translation"}}
+                                <div class="action">
+                                    <div class="btn-group left">
+                                        <button class="btn blue play-again" {{action "replay" model}}>
+                                            <span class="icon-replay"></span> Play again
+                                        </button>
+                                        <button class="btn blue play-again-slower"><span class="icon-replay-slower"></span></button>
+                                    </div>
+                                    <button class="btn green right" {{action "submitTranslation" model}}>Submit</button>
+                                </div>
+                            </div>
+                        {{/if}}
+                    {{/unless}}
                 </li>
             {{/if}}
         </script>

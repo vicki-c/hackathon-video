@@ -5,13 +5,15 @@ App = Ember.Application.create({
 App.ApplicationAdapter = DS.FixtureAdapter.extend();
 
 App.Router.map(function() {
-    this.resource('video', { path: '/:video_id' });
+    this.resource('video', { path: '/:source_language/:target_language/:video_id' });
 });
 
 App.VideoRoute = Ember.Route.extend({
     model: function(params) {
         var model = this.store.createRecord('video', {
-            videoId: params.video_id
+            videoId: params.video_id,
+            sourceLanguage: params.source_language,
+            targetLanguage: params.target_language
         });
         return model;
     }
@@ -19,6 +21,8 @@ App.VideoRoute = Ember.Route.extend({
 
 App.Video = DS.Model.extend({
     videoId: DS.attr('string'),
+    sourceLanguage: DS.attr('string'),
+    targetLanguage: DS.attr('string'),
     segments: DS.hasMany('segment'),
     videoUrl: function() {
         return 'http://www.youtube.com/watch?v=' + this.get('videoId')
@@ -73,7 +77,7 @@ App.VideoController = Ember.ObjectController.extend({
             this.get('media').setCurrentTime(segment.get('start'));
             this.get('media').play();
         },
-        skip : function(segment) {
+        skipTranscription : function(segment) {
             if(segment.get('end') <= this.get('time')) {
                 this._makeNewSegment();
             }
@@ -85,9 +89,12 @@ App.VideoController = Ember.ObjectController.extend({
         },
         startTranslating : function() {
             var segments = this.get('model.segments');
-            var segmentIndex = segments.filterBy('translation').length;
+            var segmentIndex = segments.filter(function(segment) {
+                return segment.get('translation') || segment.get('nothingSaid');
+            }).length;
             segments.setEach('focus', false);
 
+            console.log(segmentIndex)
             var segment = this.get('model.segments').objectAt(segmentIndex);
             segment.set('translating', true);
             segment.set('focus', true);
@@ -123,6 +130,8 @@ App.VideoController = Ember.ObjectController.extend({
     _makeNewSegment : function() {
         var segments = this.get('model.segments');
         var segment = this.store.createRecord('segment', {
+            sourceLanguage: this.get('sourceLanguage'), // hack?
+            targetLanguage: this.get('targetLanguage'),
             start: this.get('time'),
             focus: true
         });
@@ -150,13 +159,13 @@ App.SourceSegmentController = Ember.ObjectController.extend({
 
             this.get('target').send('submitTranscription', segment);
         },
-        skip : function(segment) {
+        skipTranscription : function(segment) {
             segment.set('text', '');
             segment.set('played', false);
             //segment.set('done', true);
             this.set('transcription', '');
 
-            this.get('target').send('skip', segment);
+            this.get('target').send('skipTranscription', segment);
         },
         close : function() {
             this.set('focus', false);
@@ -170,7 +179,10 @@ App.SourceSegmentController = Ember.ObjectController.extend({
         }
     },
     toggleNothingSaid : function() {
-        this.set('transcription', '');
+        if(this.get('model.nothingSaid')) {
+            this.get('model').set('transcription', '');
+            this.get('model').set('translating', true);
+        }
     }.observes('model.nothingSaid')
 });
 
@@ -195,7 +207,7 @@ App.TargetSegmentController = Ember.ObjectController.extend({
         }
 
         var self = this;
-        $.get('http://d.duolingo.com/words/hints/fr/en', {
+        $.get('http://d.duolingo.com/words/hints/'+this.get('model.sourceLanguage')+'/'+this.get('model.targetLanguage'), {
             format: 'new',
             sentence: this.get('model.text')
         }, function(data) {
